@@ -49,7 +49,7 @@ sub request {
 
 sub _validate_web_response {
   my($res,$success_code) = @_;
-  $res->is_error && confess($res->content);
+  $res->is_error() && confess($res->content);
 }
 sub _post {
   my($self,$url,$data)=@_;
