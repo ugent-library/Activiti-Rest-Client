@@ -10,5 +10,5 @@ my $client = Activiti::Rest->new(
   url => 'http://kermit:kermit@localhost:8080/activiti-rest/service'
 );
 
-my $form = $client->form(processDefinitionId => "vacationRequest:1:33");
+my $form = $client->form(processDefinitionId => "vacationRequest:1:33")->parsed_content;
 print Dumper($form);

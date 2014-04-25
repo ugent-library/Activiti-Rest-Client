@@ -29,20 +29,20 @@ sub request {
   my $params = $args{params};
   my $method = $args{method} || "GET";
   my $path = $args{path} || "";
+  my $headers = $args{headers};
 
   my $url = $self->url().$path;
 
   my $res;
   if(uc($method) eq "GET"){
-    $res = $self->_get($url,$params);
+    $res = $self->_get($url,$params,$headers);
   }elsif(uc($method) eq "POST"){
-    $res = $self->_post($url,$params);
+    $res = $self->_post($url,$params,$headers);
   }elsif(uc($method) eq "PUT"){
-    $res = $self->_put($url,$params);
+    $res = $self->_put($url,$params,$headers);
   }else{
     confess "method $method not supported";
   }
-  _validate_web_response($res);
 
   $res;
 }
@@ -52,12 +52,20 @@ sub _validate_web_response {
   $res->is_error() && confess($res->content);
 }
 sub _post {
-  my($self,$url,$data)=@_;
-  $self->ua->post($url,_construct_params_as_array($data));
+  my($self,$url,$params,$headers)=@_;
+  my @args = ($url,_construct_params_as_array($params));
+  my @headers;
+  @headers = @{ _construct_params_as_array($headers) } if is_hash_ref($headers);
+  push @args,@headers;
+  $self->ua->post(@args);
 }
 sub _put {
-  my($self,$url,$data)=@_;
-  $self->ua->put($url,_construct_params_as_array($data));
+  my($self,$url,$params,$headers)=@_;
+  my @args = ($url);
+  my @headers;
+  @headers = @{ _construct_params_as_array($headers) } if is_hash_ref($headers);  
+  push @args,@headers;
+  $self->ua->put(@args);
 }
 sub _construct_query {
   my $data = shift;

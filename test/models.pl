@@ -10,8 +10,8 @@ my $client = Activiti::Rest->new(
   url => 'http://kermit:kermit@localhost:8080/activiti-rest/service'
 );
 
-my $models = $client->models;
+my $models = $client->models->parsed_content;
 my @ids = map { $_->{id} } @{ $models->{data} };
 for my $id(@ids){
-  print Dumper($client->model(modelId => $id));
+  print Dumper($client->model(modelId => $id)->parsed_content);
 }

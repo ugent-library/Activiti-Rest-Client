@@ -10,5 +10,5 @@ my $client = Activiti::Rest->new(
   url => 'http://kermit:kermit@localhost:8080/activiti-rest/service'
 );
 
-my $pdefs = $client->process_definitions;
+my $pdefs = $client->process_definitions->parsed_content;
 print $_."\n" for map { $_->{id} } @{ $pdefs->{data} };

@@ -3,9 +3,9 @@ use Activiti::Sane;
 use Carp qw(confess);
 use Moo;
 use Data::Util qw(:check :validate);
-use JSON qw(decode_json);
+use JSON qw(decode_json encode_json);
 use URI::Escape qw(uri_escape);
-use Encode qw(decode);
+use Activiti::Rest::Response;
 
 our $VERSION = "0.1";
 
@@ -32,7 +32,7 @@ sub deployments {
     params => \%args,
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub deployment {
   my($self,%args)=@_;
@@ -41,7 +41,7 @@ sub deployment {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub deployment_resources {
   my($self,%args)=@_;
@@ -50,7 +50,7 @@ sub deployment_resources {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub deployment_resource {
   my($self,%args)=@_;
@@ -59,7 +59,7 @@ sub deployment_resource {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub process_definitions {
   my($self,%args)=@_;
@@ -68,7 +68,7 @@ sub process_definitions {
     params => \%args,
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub process_definition {
   my($self,%args)=@_;
@@ -77,7 +77,7 @@ sub process_definition {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 
 sub process_definition_resource_data {
@@ -87,8 +87,7 @@ sub process_definition_resource_data {
     params => {},
     method => "GET"
   );
-  #TODO: ALWAYS XML?
-  decode('UTF-8',$res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 
 sub process_definition_model {
@@ -98,7 +97,7 @@ sub process_definition_model {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub process_definition_identity_links {
   my($self,%args)=@_;
@@ -107,7 +106,7 @@ sub process_definition_identity_links {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub process_definition_identity_link {
   my($self,%args)=@_;
@@ -116,7 +115,7 @@ sub process_definition_identity_link {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub models {
   my($self,%args)=@_;
@@ -124,8 +123,8 @@ sub models {
     path => "/repository/models",
     params => \%args,
     method => "GET"
-  );
-  decode_json($res->content);
+  );  
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub model {
   my($self,%args)=@_;
@@ -134,7 +133,7 @@ sub model {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub process_instances {
   my($self,%args)=@_;
@@ -143,7 +142,7 @@ sub process_instances {
     params => \%args,
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub process_instance {
   my($self,%args)=@_;
@@ -152,7 +151,34 @@ sub process_instance {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
+}
+sub query_process_instances {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/query/process-instances",
+    params => {},
+    method => "POST",
+    headers => {
+      'Content-Type' => "application/json",
+      Content => encode_json($args{content})
+    }
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
+sub start_process_instance {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/runtime/process-instances",
+    params => {},
+    method => "POST",
+    headers => {
+      'Content-Type' => "application/json",
+      Content => encode_json($args{content})
+    }
+  );
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub process_instance_identitylinks {
   my($self,%args)=@_;
@@ -161,7 +187,7 @@ sub process_instance_identitylinks {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub process_instance_variables {
   my($self,%args)=@_;
@@ -170,7 +196,7 @@ sub process_instance_variables {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub process_instance_variable {
   my($self,%args)=@_;
@@ -179,7 +205,7 @@ sub process_instance_variable {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub executions {
   my($self,%args)=@_;
@@ -188,7 +214,7 @@ sub executions {
     params => \%args,
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub execution {
   my($self,%args)=@_;
@@ -197,7 +223,7 @@ sub execution {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub execution_activities {
   my($self,%args)=@_;
@@ -206,7 +232,7 @@ sub execution_activities {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub execution_variables {
   my($self,%args)=@_;
@@ -215,7 +241,7 @@ sub execution_variables {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub tasks {
   my($self,%args)=@_;
@@ -224,7 +250,7 @@ sub tasks {
     params => \%args,
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub task {
   my($self,%args)=@_;
@@ -233,7 +259,20 @@ sub task {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
+}
+sub update_task {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/runtime/tasks/".uri_escape($args{taskId}),
+    params => {},
+    method => "PUT",
+    headers => {
+      'Content-Type' => "application/json",
+      Content => encode_json($args{content})
+    }
+  );
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub task_identity_links {
   my($self,%args)=@_;
@@ -242,7 +281,7 @@ sub task_identity_links {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub task_identity_links_users {
   my($self,%args)=@_;
@@ -251,7 +290,7 @@ sub task_identity_links_users {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub task_identity_links_groups {
   my($self,%args)=@_;
@@ -260,7 +299,7 @@ sub task_identity_links_groups {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub task_identity_link {
   my($self,%args)=@_;
@@ -269,7 +308,7 @@ sub task_identity_link {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub task_comments {
   my($self,%args)=@_;
@@ -278,7 +317,7 @@ sub task_comments {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub task_comment {
   my($self,%args)=@_;
@@ -287,7 +326,7 @@ sub task_comment {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub task_events {
   my($self,%args)=@_;
@@ -296,7 +335,7 @@ sub task_events {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub task_event {
   my($self,%args)=@_;
@@ -305,7 +344,7 @@ sub task_event {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub task_attachments {
   my($self,%args)=@_;
@@ -314,7 +353,7 @@ sub task_attachments {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub task_attachment {
   my($self,%args)=@_;
@@ -323,7 +362,7 @@ sub task_attachment {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub task_attachment_content {
   my($self,%args)=@_;
@@ -332,7 +371,7 @@ sub task_attachment_content {
     params => {},
     method => "GET"
   );
-  $res->content;
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub historic_process_instances {
   my($self,%args)=@_;
@@ -341,7 +380,7 @@ sub historic_process_instances {
     params => \%args,
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub historic_process_instance {
   my($self,%args)=@_;
@@ -350,7 +389,7 @@ sub historic_process_instance {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub historic_process_instance_comments {
   my($self,%args)=@_;
@@ -359,7 +398,7 @@ sub historic_process_instance_comments {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub historic_process_instance_comment {
   my($self,%args)=@_;
@@ -368,7 +407,7 @@ sub historic_process_instance_comment {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub historic_task_instances {
   my($self,%args)=@_;
@@ -377,7 +416,7 @@ sub historic_task_instances {
     params => \%args,
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub historic_task_instance {
   my($self,%args)=@_;
@@ -386,7 +425,7 @@ sub historic_task_instance {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub historic_task_instance_identity_links {
   my($self,%args)=@_;
@@ -395,7 +434,7 @@ sub historic_task_instance_identity_links {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub historic_activity_instances {
   my($self,%args)=@_;
@@ -404,7 +443,7 @@ sub historic_activity_instances {
     params => \%args,
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub historic_activity_instance {
   my($self,%args)=@_;
@@ -413,7 +452,7 @@ sub historic_activity_instance {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub users {
   my($self,%args)=@_;
@@ -422,7 +461,7 @@ sub users {
     params => \%args,
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub user {
   my($self,%args)=@_;
@@ -431,7 +470,7 @@ sub user {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub user_info {
   my($self,%args)=@_;
@@ -440,7 +479,7 @@ sub user_info {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 
 sub groups {
@@ -450,7 +489,7 @@ sub groups {
     params => \%args,
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 sub group {
   my($self,%args)=@_;
@@ -459,7 +498,7 @@ sub group {
     params => {},
     method => "GET"
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 
 #forms
@@ -469,8 +508,21 @@ sub form {
     path => "/form/form-data",
     params => \%args,
     method => "GET"
+  );  
+  Activiti::Rest::Response->from_http_response($res);
+}
+sub update_form {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/form/form-data",
+    params => \%args,
+    method => "POST",
+    headers => {
+      'Content-Type' => "application/json",
+      Content => encode_json($args{content})
+    }
   );
-  decode_json($res->content);
+  Activiti::Rest::Response->from_http_response($res);
 }
 
 1;
