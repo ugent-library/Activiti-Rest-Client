@@ -252,6 +252,20 @@ sub tasks {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+sub query_tasks {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/query/tasks",
+    params => {},
+    method => "POST",
+    headers => {
+      'Content-Type' => "application/json",
+      Content => encode_json($args{content})
+    }
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
 sub task {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -274,6 +288,17 @@ sub update_task {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+sub task_variables {
+  my($self,%args)=@_;
+  my $taskId = delete $args{taskId};
+  my $res = $self->ua->request(
+    path => "/runtime/tasks/".uri_escape($taskId)."/variables",
+    params => {},
+    method => "GET"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
 sub task_identity_links {
   my($self,%args)=@_;
   my $res = $self->ua->request(
