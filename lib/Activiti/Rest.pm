@@ -407,12 +407,34 @@ sub historic_process_instances {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+sub query_historic_process_instances {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/query/historic-process-instances",
+    params => {},
+    method => "POST",
+    headers => {
+      'Content-Type' => "application/json",
+      Content => encode_json($args{content})
+    }
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
 sub historic_process_instance {
   my($self,%args)=@_;
   my $res = $self->ua->request(
     path => "/history/historic-process-instances/".uri_escape($args{processInstanceId}),
     params => {},
     method => "GET"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+sub delete_historic_process_instance {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/history/historic-process-instances/".uri_escape($args{processInstanceId}),
+    params => {},
+    method => "DELETE"
   );
   Activiti::Rest::Response->from_http_response($res);
 }

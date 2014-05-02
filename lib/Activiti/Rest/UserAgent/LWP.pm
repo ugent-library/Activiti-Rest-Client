@@ -40,6 +40,8 @@ sub request {
     $res = $self->_post($url,$params,$headers);
   }elsif(uc($method) eq "PUT"){
     $res = $self->_put($url,$params,$headers);
+  }elsif(uc($method) eq "DELETE"){
+    $res = $self->_delete($url);
   }else{
     confess "method $method not supported";
   }
@@ -99,6 +101,10 @@ sub _get {
   my($self,$url,$data)=@_;
   my $query = _construct_query($data) || "";
   $self->ua->get($url."?$query");
+}
+sub _delete {
+  my($self,$url)=@_;
+  $self->ua->delete($url);
 }
 
 1;
