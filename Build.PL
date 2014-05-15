@@ -27,6 +27,7 @@ my $build = Module::Build->new(
     'Test::Exception' => 0,
     'Test::More' => 0,
   },
+  configure_requires => { 'Module::Build' => 0.42 },
   create_license => 1,
   license => 'perl',
   dist_version_from => 'lib/Activiti/Rest/Client.pm',

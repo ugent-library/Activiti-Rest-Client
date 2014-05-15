@@ -15,6 +15,10 @@ our $VERSION = "0.1";
 
   Activiti::Rest::Client - Low level client for the Activiti Rest API
 
+=head1 NOTE
+
+  This is a work in progress. More documentation will be added in time
+
 =head1 PROJECT 
 
   see http://www.activiti.org/userguide

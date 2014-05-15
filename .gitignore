@@ -1,0 +1,11 @@
+.DS_Store
+*.swp
+.build
+_build
+blib
+Build
+LICENSE
+Makefile.PL
+META.*
+MYMETA.*
+*.bak
