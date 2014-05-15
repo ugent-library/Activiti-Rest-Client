@@ -1,4 +1,4 @@
-package Activiti::Rest;
+package Activiti::Rest::Client;
 use Activiti::Sane;
 use Carp qw(confess);
 use Moo;
@@ -10,6 +10,44 @@ use Activiti::Rest::Response;
 our $VERSION = "0.1";
 
 #see: http://www.activiti.org/userguide
+
+=head1 NAME
+
+  Activiti::Rest::Client - Low level client for the Activiti Rest API
+
+=head1 PROJECT 
+
+  see http://www.activiti.org/userguide
+
+=head1 SYNOPSIS
+
+  my $client = Activiti::Rest::Client->new(
+    url => 'http://kermit:kermit@localhost:8080/activiti-rest/service'
+  );
+
+  my $res = $client->process_definitions;
+
+  die("no parsed content") unless $res->has_parsed_content;
+
+  my $pdefs = $res->parsed_content;
+
+  my @ids = map { $_->{id} } @{ $pdefs->{data} };
+  for my $id(@ids){
+    print Dumper($client->process_definition(processDefinitionId => $id)->parsed_content);
+  }
+
+=head1 CONSTRUCTOR parameters
+
+=head2 url
+
+  base url of the activiti rest api
+  activiti-rest uses basic http authentication, so username and password should be included in the url
+
+  e.g.
+
+  http://kermit:kermit@localhost:8080/activiti-rest/service
+
+=cut
 
 has url => (
   is => 'ro',
@@ -25,6 +63,20 @@ sub _build_ua {
   require Activiti::Rest::UserAgent::LWP;
   Activiti::Rest::UserAgent::LWP->new(url => $_[0]->url());  
 }
+
+=head1 METHODS
+
+=head2 deployments
+
+  Retrieve list of Deployments
+
+  parameters: see user guide (http://www.activiti.org/userguide/index.html#N13293)
+
+  equal to rest call:
+
+    GET repository/deployments
+
+=cut
 sub deployments {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -34,6 +86,21 @@ sub deployments {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 deployment
+
+  Get a deployment
+
+  parameters: 
+    deploymentId
+    
+  other parameters: see user guide (http://www.activiti.org/userguide/index.html#N1332E)
+
+  equal to rest call:
+
+    GET repository/deployments/:deploymentId
+
+=cut
+
 sub deployment {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -43,6 +110,22 @@ sub deployment {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 deployment_resources
+
+  List resources in a deployment
+
+  parameters:
+
+    deploymentId
+
+  other parameters: see user guide (http://www.activiti.org/userguide/index.html#N133F1)
+
+  equal to rest call:
+
+    GET repository/deployments/:deploymentId/resources
+
+=cut
+
 sub deployment_resources {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -52,6 +135,24 @@ sub deployment_resources {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+
+=head2 deployment_resource
+
+  Get a deployment resource
+
+  parameters:
+
+    deploymentId
+    resourceId
+
+  other parameters: see user guide (http://www.activiti.org/userguide/index.html#N1345B)
+
+  equal to rest call:
+
+    GET repository/deployments/:deploymentId/resources/:resourceId
+
+=cut
+
 sub deployment_resource {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -61,6 +162,18 @@ sub deployment_resource {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 process_definitions
+
+  List of process definitions
+
+  parameters: see user guide (http://www.activiti.org/userguide/index.html#N13520)
+
+  equal to rest call:
+
+    GET repository/process-definitions
+
+=cut
+
 sub process_definitions {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -70,6 +183,22 @@ sub process_definitions {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 process_definition
+
+  Get a process definition
+
+  parameters:
+
+    processDefinitionId
+
+  other parameters: see user guide (http://www.activiti.org/userguide/index.html#N13605)
+
+  equal to rest call:
+
+    GET repository/process-definitions/:processDefinitionId
+
+=cut
+
 sub process_definition {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -79,6 +208,19 @@ sub process_definition {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 process_definition_resource_data
+
+  Get a process definition resource content
+
+  parameters:
+
+    processDefinitionId
+
+  equal to rest call:
+
+    GET repository/process-definitions/:processDefinitionId/resourcedata
+
+=cut
 
 sub process_definition_resource_data {
   my($self,%args)=@_;
@@ -90,6 +232,20 @@ sub process_definition_resource_data {
   Activiti::Rest::Response->from_http_response($res);
 }
 
+=head2 process_definition_model
+
+  Get a process definition BPMN model
+
+  parameters:
+
+    processDefinitionId
+
+  equal to rest call:
+
+    GET repository/process-definitions/:processDefinitionId/model
+
+=cut
+
 sub process_definition_model {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -99,6 +255,19 @@ sub process_definition_model {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 process_definition_identity_links
+
+  Get all candidate starters for a process-definition
+
+  parameters:
+
+    processDefinitionId
+
+  equal to rest call:
+
+    GET repository/process-definitions/:processDefinitionId/identitylinks
+
+=cut
 sub process_definition_identity_links {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -108,6 +277,21 @@ sub process_definition_identity_links {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 process_definition_identity_link
+
+  Get a candidate starter from a process definition
+
+  parameters: (see http://www.activiti.org/userguide/index.html#N138A9)
+
+    processDefinitionId
+    family    
+    identityId
+
+  equal to rest call:
+
+    GET repository/process-definitions/:processDefinitionId/identitylinks/:family/:identityId
+
+=cut
 sub process_definition_identity_link {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -117,6 +301,17 @@ sub process_definition_identity_link {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 models
+
+  Get a list of models
+
+  Parameters: see user guide (http://www.activiti.org/userguide/index.html#N1390A)
+
+  equal to rest call:
+
+    GET repository/models
+
+=cut
 sub models {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -126,6 +321,20 @@ sub models {
   );  
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 models
+
+  Get a model
+
+  Parameters: 
+
+    modelId
+
+  equal to rest call:
+
+    GET repository/models/:modelId
+
+=cut
+
 sub model {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -135,6 +344,18 @@ sub model {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 process_instances
+
+  List of process instances
+
+  Parameters: see user guide (http://www.activiti.org/userguide/index.html#restProcessInstancesGet)
+
+  equal to rest call:
+
+    GET runtime/process-instances
+
+=cut
+
 sub process_instances {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -144,6 +365,20 @@ sub process_instances {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 process_instance
+
+  Get a process instance
+
+  Parameters:
+
+    processInstanceId 
+
+  equal to rest call:
+
+    GET runtime/process-instances/:processInstanceId
+
+=cut
+
 sub process_instance {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -153,6 +388,18 @@ sub process_instance {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 query_process_instances
+
+  Query process instances
+
+  Parameters: see user guide (http://www.activiti.org/userguide/index.html#N13E2A)
+
+  equal to rest call:
+
+    POST runtime/process-instances
+
+=cut
+
 sub query_process_instances {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -166,6 +413,17 @@ sub query_process_instances {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 start_process_instance
+    
+  Start a process instance
+
+  Parameters: see user guide (http://www.activiti.org/userguide/index.html#N13CE6)
+
+  equal to rest call:
+
+    POST runtime/process-instances
+
+=cut
 
 sub start_process_instance {
   my($self,%args)=@_;
@@ -180,6 +438,20 @@ sub start_process_instance {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 process_instance_identitylinks
+ 
+  Get involved people for process instance   
+
+  Parameters: 
+  
+    processInstanceId
+
+  equal to rest call:
+
+    GET runtime/process-instances/:processInstanceId/identitylinks
+
+=cut
+
 sub process_instance_identitylinks {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -189,6 +461,20 @@ sub process_instance_identitylinks {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 process_instance_variables
+ 
+  List of variables for a process instance
+
+  Parameters: 
+  
+    processInstanceId
+
+  equal to rest call:
+
+    GET runtime/process-instances/:processInstanceId/variables
+
+=cut
+
 sub process_instance_variables {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -198,6 +484,21 @@ sub process_instance_variables {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 process_instance_variable
+ 
+  Get a variable for a process instance
+
+  Parameters: 
+  
+    processInstanceId
+    variableName
+
+  equal to rest call:
+
+    GET runtime/process-instances/:processInstanceId/variables/:variableName
+
+=cut
+
 sub process_instance_variable {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -207,6 +508,44 @@ sub process_instance_variable {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 process_instance_diagram
+
+  Get a diagram for a process instance
+
+  Parameters: 
+  
+    processInstanceId
+
+  equal to rest call:
+
+    GET runtime/process-instances/:processInstanceId/diagram
+
+  when successfull the "content_type" of the response is "image/png" and "content" is equal to the image data
+
+=cut
+
+#return: png image data
+sub process_instance_diagram {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/runtime/process-instances/".uri_escape($args{processInstanceId})."/diagram",
+    params => {},
+    method => "GET"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+=head2 executions
+
+  List of executions
+
+  Parameters: see user guide (http://www.activiti.org/userguide/index.html#restExecutionsGet)
+  
+  equal to rest call:
+
+    GET repository/executions
+
+=cut
+
 sub executions {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -216,6 +555,20 @@ sub executions {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 execution
+
+  Get an execution
+
+  Parameters:
+
+    executionId
+  
+  equal to rest call:
+
+    GET repository/executions/:executionId
+
+=cut
+
 sub execution {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -225,6 +578,20 @@ sub execution {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 execution_activities
+
+  Get active activities in an execution
+
+  Parameters:
+
+    executionId
+  
+  equal to rest call:
+
+    GET repository/executions/:executionId/activities
+
+=cut
+
 sub execution_activities {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -234,6 +601,20 @@ sub execution_activities {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 execution_variables
+
+  List of variables for an execution
+
+  Parameters:
+
+    executionId
+  
+  equal to rest call:
+
+    GET repository/executions/:executionId/variables
+
+=cut
+
 sub execution_variables {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -243,6 +624,18 @@ sub execution_variables {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 tasks
+
+  List of tasks
+
+  Parameters: see user guide (http://www.activiti.org/userguide/index.html#restTasksGet)
+
+  equal to rest call:
+
+    GET runtime/tasks
+
+=cut
+
 sub tasks {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -252,6 +645,18 @@ sub tasks {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 query_tasks
+
+  Query for tasks
+
+  Parameters: see user guide (http://www.activiti.org/userguide/index.html#N148B7)
+
+  equal to rest call:
+
+    POST query/tasks
+
+=cut
+
 sub query_tasks {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -265,6 +670,19 @@ sub query_tasks {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 task
+
+  Get a task
+
+  Parameters: 
+
+    taskId
+
+  equal to rest call:
+
+    GET runtime/tasks/:taskId
+
+=cut
 
 sub task {
   my($self,%args)=@_;
@@ -275,6 +693,22 @@ sub task {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 update_task
+
+  Update a task
+
+  Parameters: 
+
+    taskId
+
+  Body parameters: see user guide (http://www.activiti.org/userguide/index.html#N148FA)
+
+  equal to rest call:
+
+    PUT runtime/tasks/:taskId
+
+=cut
+
 sub update_task {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -288,6 +722,21 @@ sub update_task {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 task_variables
+
+  Get all variables for a task
+
+  Parameters: 
+
+    taskId
+    scope (global|local)
+
+  equal to rest call:
+
+    GET runtime/tasks/:taskId/variables?scope=:scope
+
+=cut
+
 sub task_variables {
   my($self,%args)=@_;
   my $taskId = delete $args{taskId};
@@ -298,6 +747,19 @@ sub task_variables {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 task_identity_links
+
+  Get all identity links for a task
+
+  Parameters: 
+
+    taskId
+
+  equal to rest call:
+
+    GET runtime/tasks/:taskId/identitylinks
+
+=cut
 
 sub task_identity_links {
   my($self,%args)=@_;
@@ -308,6 +770,22 @@ sub task_identity_links {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 task_identity_links_users
+
+=head2 task_identity_links_groups
+
+  Get all identity links for a task for either groups or users
+
+  Parameters: 
+
+    taskId
+
+  equal to rest call:
+
+    GET runtime/tasks/:taskId/identitylinks/(users|groups)
+
+=cut
+
 sub task_identity_links_users {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -335,6 +813,20 @@ sub task_identity_link {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 task_comments
+
+  Get all comments on a task
+
+  Parameters: 
+
+    taskId
+
+  equal to rest call:
+
+    GET runtime/tasks/:taskId/comments
+
+=cut
+
 sub task_comments {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -344,6 +836,21 @@ sub task_comments {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 task_comment
+
+  Get a comments on a task
+
+  Parameters: 
+
+    taskId
+    commentId
+
+  equal to rest call:
+
+    GET runtime/tasks/:taskId/comments/:commentId
+
+=cut
+
 sub task_comment {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -353,6 +860,20 @@ sub task_comment {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 task_events
+
+  Get all events for a task
+
+  Parameters: 
+
+    taskId
+
+  equal to rest call:
+
+    GET runtime/tasks/:taskId/events
+
+=cut
+
 sub task_events {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -362,6 +883,21 @@ sub task_events {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 task_event
+
+  Get an event for a task
+
+  Parameters: 
+
+    taskId
+    eventId
+
+  equal to rest call:
+
+    GET runtime/tasks/:taskId/events/:eventId
+
+=cut
+
 sub task_event {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -371,6 +907,20 @@ sub task_event {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 task_attachments
+
+  Get all attachments on a task
+
+  Parameters: 
+
+    taskId
+
+  equal to rest call:
+
+    GET runtime/tasks/:taskId/attachments
+
+=cut
+
 sub task_attachments {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -380,6 +930,21 @@ sub task_attachments {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 task_attachment
+
+  Get an attachment on a task
+
+  Parameters: 
+
+    taskId
+    attachmentId
+
+  equal to rest call:
+
+    GET runtime/tasks/:taskId/comments/:attachmentId
+
+=cut
+
 sub task_attachment {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -389,6 +954,21 @@ sub task_attachment {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 task_attachment_content
+
+  Get the content for an attachment on a task
+
+  Parameters: 
+
+    taskId
+    attachmentId
+
+  equal to rest call:
+
+    GET runtime/tasks/:taskId/attachments/:attachmentId/content
+
+=cut
+
 sub task_attachment_content {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -398,6 +978,18 @@ sub task_attachment_content {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 historic_process_instances
+
+  List of historic process instances
+
+  Parameters: see user guide (http://www.activiti.org/userguide/index.html#restHistoricProcessInstancesGet)
+
+  equal to rest call:
+
+    GET history/historic-process-instances
+
+=cut
+
 sub historic_process_instances {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -407,6 +999,17 @@ sub historic_process_instances {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 query_historic_process_instances
+
+  Query for historic process instances
+
+  Parameters: see user guide (http://www.activiti.org/userguide/index.html#N153C2)
+
+  equal to rest call:
+
+    POST history/historic-process-instances
+
+=cut
 sub query_historic_process_instances {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -420,6 +1023,20 @@ sub query_historic_process_instances {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 historic_process_instance
+
+  Get a historic process instance
+
+  Parameters: 
+
+    processInstanceId
+
+  equal to rest call:
+
+    GET history/historic-process-instances/:processInstanceId
+
+=cut
+
 sub historic_process_instance {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -429,6 +1046,20 @@ sub historic_process_instance {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 delete_historic_process_instance
+
+  Delete a historic process instance
+
+  Parameters: 
+
+    processInstanceId
+
+  equal to rest call:
+
+    DELETE history/historic-process-instances/:processInstanceId
+
+=cut
+
 sub delete_historic_process_instance {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -438,6 +1069,20 @@ sub delete_historic_process_instance {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 historic_process_instance_comments
+
+  Get all comments on a historic process instance
+
+  Parameters:
+
+    processInstanceId
+
+  equal to rest call:
+
+    GET history/historic-process-instances/:processInstanceId/comments
+
+=cut
+
 sub historic_process_instance_comments {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -447,6 +1092,21 @@ sub historic_process_instance_comments {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 historic_process_instance_comment
+
+  Get a comment on a historic process instance
+
+  Parameters:
+
+    processInstanceId
+    commentId
+
+  equal to rest call:
+
+    GET history/historic-process-instances/:processInstanceId/comments/:commentId
+
+=cut
+
 sub historic_process_instance_comment {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -456,6 +1116,18 @@ sub historic_process_instance_comment {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 historic_task_instances
+
+  Get historic task instances
+
+  Parameters: see user guide (http://www.activiti.org/userguide/index.html#restHistoricTaskInstancesGet)    
+
+  equal to rest call:
+
+    GET history/historic-task-instances
+
+=cut
+
 sub historic_task_instances {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -465,6 +1137,20 @@ sub historic_task_instances {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 historic_task_instance
+
+  Get a historic task instance
+
+  Parameters: 
+
+    taskId
+
+  equal to rest call:
+
+    GET history/historic-task-instances/:taskId
+
+=cut
+
 sub historic_task_instance {
   my($self,%args)=@_;
   my $res = $self->ua->request(
@@ -474,6 +1160,20 @@ sub historic_task_instance {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 historic_task_instance_identity_links
+
+  Get the identity links of a historic task instance
+
+  Parameters: 
+
+    taskId
+
+  equal to rest call:
+
+    GET history/historic-task-instances/:taskId/identitylinks
+
+=cut
+
 sub historic_task_instance_identity_links {
   my($self,%args)=@_;
   my $res = $self->ua->request(

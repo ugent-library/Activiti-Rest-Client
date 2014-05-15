@@ -1,12 +1,12 @@
 #!/usr/bin/env perl
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use Activiti::Rest;
+use Activiti::Rest::Client;
 use Data::Dumper;
 
 binmode STDOUT,":utf8";
 
-my $client = Activiti::Rest->new(
+my $client = Activiti::Rest::Client->new(
   url => 'http://kermit:kermit@localhost:8080/activiti-rest/service'
 );
 

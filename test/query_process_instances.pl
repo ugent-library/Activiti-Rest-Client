@@ -1,12 +1,12 @@
 #!/usr/bin/env perl
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use Activiti::Rest;
+use Activiti::Rest::Client;
 use Data::Dumper;
 
 binmode STDOUT,":utf8";
 
-my $client = Activiti::Rest->new(
+my $client = Activiti::Rest::Client->new(
   url => 'http://rest:rest@andric.ugent.be:8888/activiti-rest/service'
 );
 

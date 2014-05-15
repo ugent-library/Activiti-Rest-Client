@@ -15,7 +15,7 @@ my $recommends = {
   'Term::ReadKey' => 0
 };
 my $build = Module::Build->new(
-  module_name => 'Activiti-Rest',
+  module_name => 'Activiti-Rest-Client',
   dist_author => [
     'Nicolas Franck <nicolas.franck@ugent.be>'
   ],
@@ -29,7 +29,7 @@ my $build = Module::Build->new(
   },
   create_license => 1,
   license => 'perl',
-  dist_version_from => 'lib/Activiti/Rest.pm',
+  dist_version_from => 'lib/Activiti/Rest/Client.pm',
   create_makefile_pl => 'traditional'  
 );
 $build->create_build_script;
