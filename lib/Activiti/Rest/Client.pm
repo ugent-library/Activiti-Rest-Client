@@ -7,7 +7,7 @@ use JSON qw(decode_json encode_json);
 use URI::Escape qw(uri_escape);
 use Activiti::Rest::Response;
 
-our $VERSION = "0.1";
+our $VERSION = "0.11";
 
 #see: http://www.activiti.org/userguide
 
@@ -389,6 +389,15 @@ sub process_instance {
     path => "/runtime/process-instances/".uri_escape($args{processInstanceId}),
     params => {},
     method => "GET"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+sub delete_process_instance {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/runtime/process-instances/".uri_escape($args{processInstanceId}),
+    params => {},
+    method => "DELETE"
   );
   Activiti::Rest::Response->from_http_response($res);
 }
@@ -1202,6 +1211,28 @@ sub historic_activity_instance {
     path => "/history/historic-activity-instances/".uri_escape($args{activityInstanceId}),
     params => {},
     method => "GET"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+sub historic_detail {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/history/historic-detail",
+    params => \%args,
+    method => "GET"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+sub query_historic_detail {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/query/historic-detail",
+    params => {},
+    method => "POST",
+    headers => {
+      'Content-Type' => "application/json",
+      Content => encode_json($args{content})
+    }
   );
   Activiti::Rest::Response->from_http_response($res);
 }
