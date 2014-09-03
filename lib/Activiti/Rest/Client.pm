@@ -7,7 +7,7 @@ use JSON qw(decode_json encode_json);
 use URI::Escape qw(uri_escape);
 use Activiti::Rest::Response;
 
-our $VERSION = "0.11";
+our $VERSION = "0.12";
 
 #see: http://www.activiti.org/userguide
 
@@ -674,6 +674,19 @@ sub query_tasks {
   my($self,%args)=@_;
   my $res = $self->ua->request(
     path => "/query/tasks",
+    params => {},
+    method => "POST",
+    headers => {
+      'Content-Type' => "application/json",
+      Content => encode_json($args{content})
+    }
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+sub query_historic_task_instances {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/query/historic-task-instances",
     params => {},
     method => "POST",
     headers => {
