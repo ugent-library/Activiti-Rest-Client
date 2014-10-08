@@ -11,17 +11,22 @@ with qw(Activiti::Rest::UserAgent);
 has ua => (
   is => 'ro',
   lazy => 1,
-  default => sub {
-    my $ua = LWP::UserAgent->new(
-      cookie_jar => {}
-    );
-    if(is_string($ENV{LWP_TRACE})){
-      $ua->add_handler("request_send",  sub { shift->dump; return });
-      $ua->add_handler("response_done", sub { shift->dump; return });
-    }
-    $ua;
-  }
+  builder => '_build_ua'
 );
+sub _build_ua {
+  my $self = $_[0];
+  my $ua = LWP::UserAgent->new(
+    cookie_jar => {}
+  );
+  if(is_string($ENV{LWP_TRACE})){
+    $ua->add_handler("request_send",  sub { shift->dump; return });
+    $ua->add_handler("response_done", sub { shift->dump; return });
+  }
+  for my $header(@{ $self->default_headers() }){
+    $ua->default_header($header->[0] => $header->[1]);
+  }
+  $ua;
+}
 
 sub request {
   my($self,%args) = @_;
@@ -41,7 +46,7 @@ sub request {
   }elsif(uc($method) eq "PUT"){
     $res = $self->_put($url,$params,$headers);
   }elsif(uc($method) eq "DELETE"){
-    $res = $self->_delete($url);
+    $res = $self->_delete($url,$params,$headers);
   }else{
     confess "method $method not supported";
   }
@@ -65,7 +70,7 @@ sub _put {
   my($self,$url,$params,$headers)=@_;
   my @args = ($url);
   my @headers;
-  @headers = @{ _construct_params_as_array($headers) } if is_hash_ref($headers);  
+  @headers = @{ _construct_params_as_array($headers) } if is_hash_ref($headers);
   push @args,@headers;
   $self->ua->put(@args);
 }
@@ -87,7 +92,7 @@ sub _construct_params_as_array {
   my $params = shift;
   my @array = ();
   for my $key(keys %$params){
-    if(is_array_ref($params->{$key})){    
+    if(is_array_ref($params->{$key})){
       for my $val(@{ $params->{$key} }){
         push @array,$key => $val;
       }
@@ -103,7 +108,9 @@ sub _get {
   $self->ua->get($url."?$query");
 }
 sub _delete {
-  my($self,$url)=@_;
+  my($self,$url,$params,$headers)=@_;
+  my $query = _construct_query($params) || "";
+  $url .= "?$query";
   $self->ua->delete($url);
 }
 

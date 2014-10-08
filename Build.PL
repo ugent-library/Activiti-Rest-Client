@@ -3,7 +3,7 @@ use strict;
 use Module::Build;
 
 my $requires = {
-  perl => '5.10.0', 
+  perl => '5.10.0',
   Carp => 0,
   'Moo' => 0,
   'URI::Escape' => 0,
@@ -31,6 +31,6 @@ my $build = Module::Build->new(
   create_license => 1,
   license => 'perl',
   dist_version_from => 'lib/Activiti/Rest/Client.pm',
-  create_makefile_pl => 'traditional'  
+  create_makefile_pl => 'traditional'
 );
 $build->create_build_script;

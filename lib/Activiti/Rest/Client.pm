@@ -7,21 +7,25 @@ use JSON qw(decode_json encode_json);
 use URI::Escape qw(uri_escape);
 use Activiti::Rest::Response;
 
-our $VERSION = "0.12";
+our $VERSION = "0.121";
 
 #see: http://www.activiti.org/userguide
 
 =head1 NAME
 
-  Activiti::Rest::Client - Low level client for the Activiti Rest API
+Activiti::Rest::Client - Low level client for the Activiti Rest API
+
+=head1 AUTHORS
+
+Nicolas Franck C<< <nicolas.franck at ugent.be> >>
 
 =head1 NOTE
 
-  This is a work in progress. More documentation will be added in time
+This is a work in progress. More documentation will be added in time
 
-=head1 PROJECT 
+=head1 PROJECT
 
-  see http://www.activiti.org/userguide
+see http://www.activiti.org/userguide
 
 =head1 SYNOPSIS
 
@@ -65,7 +69,7 @@ has ua => (
 );
 sub _build_ua {
   require Activiti::Rest::UserAgent::LWP;
-  Activiti::Rest::UserAgent::LWP->new(url => $_[0]->url());  
+  Activiti::Rest::UserAgent::LWP->new(url => $_[0]->url());
 }
 
 =head1 METHODS
@@ -94,9 +98,9 @@ sub deployments {
 
   Get a deployment
 
-  parameters: 
+  parameters:
     deploymentId
-    
+
   other parameters: see user guide (http://www.activiti.org/userguide/index.html#N1332E)
 
   equal to rest call:
@@ -288,7 +292,7 @@ sub process_definition_identity_links {
   parameters: (see http://www.activiti.org/userguide/index.html#N138A9)
 
     processDefinitionId
-    family    
+    family
     identityId
 
   equal to rest call:
@@ -322,14 +326,14 @@ sub models {
     path => "/repository/models",
     params => \%args,
     method => "GET"
-  );  
+  );
   Activiti::Rest::Response->from_http_response($res);
 }
 =head2 models
 
   Get a model
 
-  Parameters: 
+  Parameters:
 
     modelId
 
@@ -375,7 +379,7 @@ sub process_instances {
 
   Parameters:
 
-    processInstanceId 
+    processInstanceId
 
   equal to rest call:
 
@@ -396,11 +400,38 @@ sub delete_process_instance {
   my($self,%args)=@_;
   my $res = $self->ua->request(
     path => "/runtime/process-instances/".uri_escape($args{processInstanceId}),
-    params => {},
+    params => { deleteReason => $args{deleteReason} },
     method => "DELETE"
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+sub suspend_process_instance {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/runtime/process-instances/".uri_escape($args{processInstanceId}),
+    params => {},
+    headers => {
+      'Content-Type' => "application/json",
+      Content => encode_json({ action => "suspend" })
+    },
+    method => "PUT"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+sub activate_process_instance {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/runtime/process-instances/".uri_escape($args{processInstanceId}),
+    params => {},
+    headers => {
+      'Content-Type' => "application/json",
+      Content => encode_json({ action => "activate" })
+    },
+    method => "PUT"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
 =head2 query_process_instances
 
   Query process instances
@@ -427,7 +458,7 @@ sub query_process_instances {
   Activiti::Rest::Response->from_http_response($res);
 }
 =head2 start_process_instance
-    
+
   Start a process instance
 
   Parameters: see user guide (http://www.activiti.org/userguide/index.html#N13CE6)
@@ -452,11 +483,11 @@ sub start_process_instance {
   Activiti::Rest::Response->from_http_response($res);
 }
 =head2 process_instance_identitylinks
- 
-  Get involved people for process instance   
 
-  Parameters: 
-  
+  Get involved people for process instance
+
+  Parameters:
+
     processInstanceId
 
   equal to rest call:
@@ -475,11 +506,11 @@ sub process_instance_identitylinks {
   Activiti::Rest::Response->from_http_response($res);
 }
 =head2 process_instance_variables
- 
+
   List of variables for a process instance
 
-  Parameters: 
-  
+  Parameters:
+
     processInstanceId
 
   equal to rest call:
@@ -498,11 +529,11 @@ sub process_instance_variables {
   Activiti::Rest::Response->from_http_response($res);
 }
 =head2 process_instance_variable
- 
+
   Get a variable for a process instance
 
-  Parameters: 
-  
+  Parameters:
+
     processInstanceId
     variableName
 
@@ -521,12 +552,39 @@ sub process_instance_variable {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+sub update_process_instance_variable {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/runtime/process-instances/".uri_escape($args{processInstanceId})."/variables/".uri_escape($args{variableName}),
+    params => {},
+    method => "PUT",
+    headers => {
+      'Content-Type' => "application/json",
+      Content => encode_json($args{content})
+    }
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+#DEPRECATED!
+sub signal_process_instance {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/process-instance/".uri_escape($args{processInstanceId})."/signal",
+    params => {},
+    method => "POST",
+    headers => {
+      'Content-Type' => "application/json",
+      Content => encode_json($args{content})
+    }
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
 =head2 process_instance_diagram
 
   Get a diagram for a process instance
 
-  Parameters: 
-  
+  Parameters:
+
     processInstanceId
 
   equal to rest call:
@@ -552,7 +610,7 @@ sub process_instance_diagram {
   List of executions
 
   Parameters: see user guide (http://www.activiti.org/userguide/index.html#restExecutionsGet)
-  
+
   equal to rest call:
 
     GET repository/executions
@@ -575,7 +633,7 @@ sub executions {
   Parameters:
 
     executionId
-  
+
   equal to rest call:
 
     GET repository/executions/:executionId
@@ -598,7 +656,7 @@ sub execution {
   Parameters:
 
     executionId
-  
+
   equal to rest call:
 
     GET repository/executions/:executionId/activities
@@ -621,7 +679,7 @@ sub execution_activities {
   Parameters:
 
     executionId
-  
+
   equal to rest call:
 
     GET repository/executions/:executionId/variables
@@ -700,7 +758,7 @@ sub query_historic_task_instances {
 
   Get a task
 
-  Parameters: 
+  Parameters:
 
     taskId
 
@@ -723,7 +781,7 @@ sub task {
 
   Update a task
 
-  Parameters: 
+  Parameters:
 
     taskId
 
@@ -752,7 +810,7 @@ sub update_task {
 
   Get all variables for a task
 
-  Parameters: 
+  Parameters:
 
     taskId
     scope (global|local)
@@ -777,7 +835,7 @@ sub task_variables {
 
   Get all identity links for a task
 
-  Parameters: 
+  Parameters:
 
     taskId
 
@@ -802,7 +860,7 @@ sub task_identity_links {
 
   Get all identity links for a task for either groups or users
 
-  Parameters: 
+  Parameters:
 
     taskId
 
@@ -843,7 +901,7 @@ sub task_identity_link {
 
   Get all comments on a task
 
-  Parameters: 
+  Parameters:
 
     taskId
 
@@ -866,7 +924,7 @@ sub task_comments {
 
   Get a comments on a task
 
-  Parameters: 
+  Parameters:
 
     taskId
     commentId
@@ -890,7 +948,7 @@ sub task_comment {
 
   Get all events for a task
 
-  Parameters: 
+  Parameters:
 
     taskId
 
@@ -913,7 +971,7 @@ sub task_events {
 
   Get an event for a task
 
-  Parameters: 
+  Parameters:
 
     taskId
     eventId
@@ -937,7 +995,7 @@ sub task_event {
 
   Get all attachments on a task
 
-  Parameters: 
+  Parameters:
 
     taskId
 
@@ -960,7 +1018,7 @@ sub task_attachments {
 
   Get an attachment on a task
 
-  Parameters: 
+  Parameters:
 
     taskId
     attachmentId
@@ -984,7 +1042,7 @@ sub task_attachment {
 
   Get the content for an attachment on a task
 
-  Parameters: 
+  Parameters:
 
     taskId
     attachmentId
@@ -1053,7 +1111,7 @@ sub query_historic_process_instances {
 
   Get a historic process instance
 
-  Parameters: 
+  Parameters:
 
     processInstanceId
 
@@ -1076,7 +1134,7 @@ sub historic_process_instance {
 
   Delete a historic process instance
 
-  Parameters: 
+  Parameters:
 
     processInstanceId
 
@@ -1146,7 +1204,7 @@ sub historic_process_instance_comment {
 
   Get historic task instances
 
-  Parameters: see user guide (http://www.activiti.org/userguide/index.html#restHistoricTaskInstancesGet)    
+  Parameters: see user guide (http://www.activiti.org/userguide/index.html#restHistoricTaskInstancesGet)
 
   equal to rest call:
 
@@ -1167,7 +1225,7 @@ sub historic_task_instances {
 
   Get a historic task instance
 
-  Parameters: 
+  Parameters:
 
     taskId
 
@@ -1190,7 +1248,7 @@ sub historic_task_instance {
 
   Get the identity links of a historic task instance
 
-  Parameters: 
+  Parameters:
 
     taskId
 
@@ -1303,7 +1361,7 @@ sub form {
     path => "/form/form-data",
     params => \%args,
     method => "GET"
-  );  
+  );
   Activiti::Rest::Response->from_http_response($res);
 }
 sub update_form {

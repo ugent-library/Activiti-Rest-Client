@@ -9,3 +9,5 @@ Makefile.PL
 META.*
 MYMETA.*
 *.bak
+Activiti-Rest-Client-*
+_build_params
