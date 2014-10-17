@@ -53,11 +53,6 @@ sub request {
 
   $res;
 }
-
-sub _validate_web_response {
-  my($res,$success_code) = @_;
-  $res->is_error() && confess($res->content);
-}
 sub _post {
   my($self,$url,$params,$headers)=@_;
   my @args = ($url,_construct_params_as_array($params));

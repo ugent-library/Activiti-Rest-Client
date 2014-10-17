@@ -3,6 +3,23 @@ use Activiti::Sane;
 use Moo;
 extends 'Throwable::Error';
 
+has status_code => (
+    is => 'ro',
+    required => 1
+);
+has error_message => (
+    is => 'ro',
+    required => 1
+);
+has content_type => (
+    is => 'ro',
+    required => 1
+);
+has content => (
+    is => 'ro',
+    required => 1,
+);
+
 #see: http://www.activiti.org/userguide/#N12F88 for status codes
 
 package Activiti::Rest::Error::UnAuthorized;

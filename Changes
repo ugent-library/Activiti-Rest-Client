@@ -1,2 +1,5 @@
+0.122	 2014-10-16
+	 - Extend Activiti::Rest::Error
+	 - Bug in Activiti::Rest::Error : response content only used in Activiti::Rest::Error::InternalServerError, rest uses response message
 0.121    2014-10-08
 	 - add default header "Accept: application/json" to ensure that Activiti always returns json (in newer version XML can be returned)
