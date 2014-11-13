@@ -390,6 +390,19 @@ see http://www.activiti.org/userguide
 
       GET runtime/tasks/:taskId/variables?scope=:scope
 
+## task\_variable
+
+    Get one variable for a task
+
+    Parameters:
+
+      taskId
+      scope (global|local)
+
+    equal to rest call:
+
+      GET runtime/tasks/:taskId/variables/:variableName?scope=:scope
+
 ## task\_identity\_links
 
     Get all identity links for a task
