@@ -824,13 +824,46 @@ sub update_task {
 sub task_variables {
   my($self,%args)=@_;
   my $taskId = delete $args{taskId};
+  my $scope = delete $args{scope};
+  my $params = {};
+  $params->{scope} = $scope if is_string($scope);
   my $res = $self->ua->request(
     path => "/runtime/tasks/".uri_escape($taskId)."/variables",
-    params => {},
+    params => $params,
     method => "GET"
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 task_variable
+
+  Get one variable for a task
+
+  Parameters:
+
+    taskId
+    scope (global|local)
+
+  equal to rest call:
+
+    GET runtime/tasks/:taskId/variables/:variableName?scope=:scope
+
+=cut
+
+sub task_variable {
+  my($self,%args)=@_;
+  my $taskId = delete $args{taskId};
+  my $variableName = delete $args{variableName};
+  my $scope = delete $args{scope};
+  my $params = {};
+  $params->{scope} = $scope if is_string($scope);
+  my $res = $self->ua->request(
+    path => "/runtime/tasks/".uri_escape($taskId)."/variables/$variableName",
+    params => $params,
+    method => "GET"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
 =head2 task_identity_links
 
   Get all identity links for a task
