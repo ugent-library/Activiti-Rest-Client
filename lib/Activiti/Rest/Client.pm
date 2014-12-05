@@ -1254,6 +1254,52 @@ sub historic_task_instances {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+=head2 historic_variable_instances
+
+  Get historic variable instances, either from tasks or process instances
+
+  Parameters: see user guide (http://www.activiti.org/userguide/index.html#restHistoricVariableInstancesGet)
+
+  equal to rest call:
+
+    GET history/historic-variable-instances
+
+=cut
+
+sub historic_variable_instances {
+    my($self,%args) = @_;
+    my $res = $self->ua->request(
+        path => "/history/historic-variable-instances",
+        params => \%args,
+        method => "GET"
+    );
+    Activiti::Rest::Response->from_http_response($res);
+}
+=head2 query_historic_variable_instances
+
+  Query historic variable instances, either from tasks or process instances
+
+  Parameters: see user guide (http://www.activiti.org/userguide/index.html#N15B00)
+
+  equal to rest call:
+
+    POST query/historic-variable-instances
+
+=cut
+
+sub query_historic_variable_instances {
+    my($self,%args)=@_;
+    my $res = $self->ua->request(
+        path => "/query/historic-variable-instances",
+        params => {},
+        method => "POST",
+        headers => {
+            'Content-Type' => "application/json",
+            Content => encode_json($args{content})
+        }
+    );
+    Activiti::Rest::Response->from_http_response($res);
+}
 =head2 historic_task_instance
 
   Get a historic task instance
