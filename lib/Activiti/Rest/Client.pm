@@ -7,7 +7,7 @@ use JSON qw(decode_json encode_json);
 use URI::Escape qw(uri_escape);
 use Activiti::Rest::Response;
 
-our $VERSION = "0.124";
+our $VERSION = "0.125";
 
 #see: http://www.activiti.org/userguide
 
@@ -626,6 +626,51 @@ sub executions {
   );
   Activiti::Rest::Response->from_http_response($res);
 }
+sub query_executions {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/query/executions",
+    params => {},
+    method => "POST",
+    headers => {
+      'Content-Type' => "application/json",
+      Content => encode_json($args{content})
+    }
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+=head2 query_executions
+
+    Query executions
+
+    Parameters in request body (i.e. 'content' hash)
+
+    equal to rest call:
+
+        POST query/executions
+=cut
+sub signal_execution {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/runtime/executions/".uri_escape($args{executionId}),
+    params => {},
+    method => "PUT",
+    headers => {
+      'Content-Type' => "application/json",
+      Content => encode_json($args{content})
+    }
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+=head2 signal_execution
+
+    send signal to execution
+
+    equal to rest call:
+
+        PUT runtime/executions/{executionId}
+=cut
+
 =head2 execution
 
   Get an execution

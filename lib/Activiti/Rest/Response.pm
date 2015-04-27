@@ -30,15 +30,21 @@ sub from_http_response {
 
     my $code = $res->code;
 
+    #before version 5.17
+    #   { "errorMessage": "<errorMessage>", "statusCode": "statusCode" }
+    #from version 5.17
+    #   { "message": "<http message>", "exception": "<former errorMessage>" }
+    my $content_hash = JSON::decode_json($res->content);
+    my $exception = $content_hash->{exception} || $content_hash->{errorMessage};
     my $args = {
         status_code => $res->code,
         message => $res->message,
         content => $res->content,
         content_type => $res->content_type,
-        error_message => JSON::decode_json($res->content)->{errorMessage}
+        error_message => $exception,
+        exception => $exception
     };
 
-    #{ "errorMessage": "<errorMessage>", "statusCode": "statusCode" }
 
     #The operation failed. The operation requires an Authentication header to be set. If this was present in the request, the supplied credentials are not valid or the user is not authorized to perform this operation.
     if($code eq "401"){

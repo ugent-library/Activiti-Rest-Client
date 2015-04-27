@@ -7,7 +7,13 @@ has status_code => (
     is => 'ro',
     required => 1
 );
+#prior to activiti version 5.17, now exception
 has error_message => (
+    is => 'ro',
+    required => 1
+);
+#from activiti version 5.17, formerly errorMessage
+has exception => (
     is => 'ro',
     required => 1
 );
