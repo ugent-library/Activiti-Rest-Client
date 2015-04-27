@@ -295,6 +295,24 @@ see http://www.activiti.org/userguide
 
       GET repository/executions
 
+## query\_executions
+
+    Query executions
+
+    Parameters in request body (i.e. 'content' hash)
+
+    equal to rest call:
+
+        POST query/executions
+
+## signal\_execution
+
+    send signal to execution
+
+    equal to rest call:
+
+        PUT runtime/executions/{executionId}
+
 ## execution
 
     Get an execution
