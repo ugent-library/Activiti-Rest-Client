@@ -36,11 +36,13 @@ sub from_http_response {
     #   { "message": "<http message>", "exception": "<former errorMessage>" }
     my $content_hash = JSON::decode_json($res->content);
     my $exception = $content_hash->{exception} || $content_hash->{errorMessage};
+    #can return multiple values (e.g. 'application/json','charset=utf-8')
+    my $ct = $res->content_type;
     my $args = {
         status_code => $res->code,
         message => $res->message,
         content => $res->content,
-        content_type => $res->content_type,
+        content_type => $ct,
         error_message => $exception,
         exception => $exception
     };

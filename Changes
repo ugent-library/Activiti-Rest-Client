@@ -1,3 +1,5 @@
+0.1251 2015-04-30
+   - Activiti::Rest::Response: odd number of values in anonymous hash, due to the method content_type returning multiple values
 0.125  2015-04-27
    - change in activiti-rest 5.17: error response use 'exception' instead of 'errorMessage'
    - send signal to execution
