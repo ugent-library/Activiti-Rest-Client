@@ -1,3 +1,5 @@
+0.1252 2015-07-14
+   - add charset 'UTF-8' to default header Accept
 0.1251 2015-04-30
    - Activiti::Rest::Response: odd number of values in anonymous hash, due to the method content_type returning multiple values
 0.125  2015-04-27
