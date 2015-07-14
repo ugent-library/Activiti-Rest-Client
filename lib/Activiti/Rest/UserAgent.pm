@@ -11,7 +11,7 @@ has url => (
 has default_headers => (
     is => 'ro',
     isa => sub { array_ref($_[0]); },
-    default => sub { [["Accept","application/json"]]; }
+    default => sub { [["Accept","application/json; charset=UTF-8"]]; }
 );
 
 #usage: request($params,$method)
