@@ -7,7 +7,7 @@ use JSON qw(decode_json encode_json);
 use URI::Escape qw(uri_escape);
 use Activiti::Rest::Response;
 
-our $VERSION = "0.1252";
+our $VERSION = "0.1253";
 
 #see: http://www.activiti.org/userguide
 
@@ -1497,6 +1497,57 @@ sub update_form {
     headers => {
       'Content-Type' => "application/json",
       Content => encode_json($args{content})
+    }
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
+sub jobs {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/management/jobs",
+    params => \%args,
+    method => "GET"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+sub job {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/management/jobs/".uri_escape($args{jobId}),
+    params => {},
+    method => "GET"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+sub job_exception_stacktrace {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/management/jobs/".uri_escape($args{jobId})."/exception-stacktrace",
+    params => {},
+    method => "GET"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
+sub delete_job {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/management/jobs/".uri_escape($args{jobId}),
+    params => {},
+    method => "DELETE"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+sub execute_job {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/management/jobs/".uri_escape($args{jobId}),
+    params => {},
+    method => "POST",
+    headers => {
+      'Content-Type' => "application/json",
+      Content => encode_json({ action => "execute" })
     }
   );
   Activiti::Rest::Response->from_http_response($res);
