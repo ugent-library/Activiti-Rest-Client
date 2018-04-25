@@ -42,6 +42,12 @@ see http://www.activiti.org/userguide
 
     http://kermit:kermit@localhost:8080/activiti-rest/service
 
+## timeout
+
+    timeout in seconds when connecting to the activiti rest api
+
+    default value is 180
+
 # METHODS
 
 ## deployments

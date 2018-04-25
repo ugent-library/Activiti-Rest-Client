@@ -62,6 +62,21 @@ has url => (
   isa => sub { $_[0] =~ /^https?:\/\//o or die("url must be a valid web url\n"); },
   required => 1
 );
+
+=head2 timeout
+
+  timeout in seconds when connecting to the activiti rest api
+
+  default value is 180
+
+=cut
+
+has timeout => (
+  is => 'ro',
+  isa => sub { is_integer($_[0]) && $_[0] >= 0 || die("timeout should be natural number"); },
+  lazy => 1,
+  default => sub { 180; }
+);
 has ua => (
   is => 'ro',
   lazy => 1,
@@ -69,7 +84,10 @@ has ua => (
 );
 sub _build_ua {
   require Activiti::Rest::UserAgent::LWP;
-  Activiti::Rest::UserAgent::LWP->new(url => $_[0]->url());
+  Activiti::Rest::UserAgent::LWP->new(
+    url => $_[0]->url(),
+    timeout => $_[0]->timeout()
+  );
 }
 
 =head1 METHODS
