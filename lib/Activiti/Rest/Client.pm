@@ -1571,6 +1571,64 @@ sub execute_job {
   Activiti::Rest::Response->from_http_response($res);
 }
 
+sub deadletter_jobs {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/management/deadletter-jobs",
+    params => \%args,
+    method => "GET"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
+sub deadletter_job {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/management/deadletter-jobs/".uri_escape($args{jobId}),
+    params => {},
+    method => "GET"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
+#always plain text, no matter what. Header "Content-Type" not be trusted.
+sub deadletter_job_exception_stacktrace {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/management/deadletter-jobs/".uri_escape($args{jobId})."/exception-stacktrace",
+    params => {},
+    method => "GET",
+    headers => {
+        "Accept" => "text/plain"
+    }
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
+sub delete_deadletter_job {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/management/deadletter-jobs/".uri_escape($args{jobId}),
+    params => {},
+    method => "DELETE"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
+sub execute_deadletter_job {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/management/deadletter-jobs/".uri_escape($args{jobId}),
+    params => {},
+    method => "POST",
+    headers => {
+      'Content-Type' => "application/json",
+      Content => encode_json({ action => "move" })
+    }
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
 =head1 LICENSE AND COPYRIGHT
 
 This program is free software; you can redistribute it and/or modify it
