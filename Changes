@@ -1,4 +1,5 @@
 {{$NEXT}}
+   - print debug information to STDERR instead of STDOUT
 
 0.1255  2020-06-03 11:28:58 CEST
    - add support for deadletter jobs from flowable
