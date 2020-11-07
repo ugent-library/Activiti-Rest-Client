@@ -1,4 +1,5 @@
 {{$NEXT}}
+   - add option keep_alive for client
 
 0.1256  2020-10-21 09:45:20 CEST
    - print debug information to STDERR instead of STDOUT
