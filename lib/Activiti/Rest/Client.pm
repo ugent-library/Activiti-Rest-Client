@@ -1629,6 +1629,46 @@ sub execute_deadletter_job {
   Activiti::Rest::Response->from_http_response($res);
 }
 
+sub timer_jobs {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/management/timer-jobs",
+    params => \%args,
+    method => "GET"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
+sub timer_job {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/management/timer-jobs/".uri_escape($args{jobId}),
+    params => {},
+    method => "GET"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
+sub suspended_jobs {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/management/suspended-jobs",
+    params => \%args,
+    method => "GET"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
+sub suspended_job {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/management/suspended-jobs/".uri_escape($args{jobId}),
+    params => {},
+    method => "GET"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
 =head1 LICENSE AND COPYRIGHT
 
 This program is free software; you can redistribute it and/or modify it
