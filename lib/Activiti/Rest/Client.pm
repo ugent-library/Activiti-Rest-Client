@@ -1649,6 +1649,20 @@ sub timer_job {
   Activiti::Rest::Response->from_http_response($res);
 }
 
+sub execute_timer_job {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/management/timer-jobs/".uri_escape($args{jobId}),
+    params => {},
+    method => "POST",
+    headers => {
+      'Content-Type' => "application/json",
+      Content => encode_json({ action => "move" })
+    }
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
 sub suspended_jobs {
   my($self,%args)=@_;
   my $res = $self->ua->request(
